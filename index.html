@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบนับสต็อก - Stock Counting System</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="ระบบนับสต็อกพร้อมสแกนบาร์โค้ด - Stock Counting System with Barcode Scanner">
+    <meta name="theme-color" content="#667eea">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="นับสต็อก">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-72x72.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-72x72.png">
+
+    <!-- External Libraries -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Background Gradient -->
+    <div class="bg-gradient"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <span class="icon">📦</span>
+                    ระบบนับสต็อก
+                </h1>
+                <p class="subtitle">Stock Counting System</p>
+                <div class="sync-badge" id="syncBadge" style="display: none;">✓ Synced</div>
+                <div class="sync-status" id="syncStatus" style="display: none;"></div>
+            </div>
+        </header>
+
+        <!-- Count Summary Dashboard -->
+        <div class="dashboard">
+            <div class="stat-card scanned">
+                <div class="stat-icon">✓</div>
+                <div class="stat-content">
+                    <div class="stat-label">สแกนแล้ว</div>
+                    <div class="stat-value" id="scannedCount">0</div>
+                    <div class="stat-unit">รายการ</div>
+                </div>
+            </div>
+            <div class="stat-card remaining">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <div class="stat-label">เหลือ</div>
+                    <div class="stat-value" id="remainingCount">0</div>
+                    <div class="stat-unit">รายการ</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <button class="btn btn-primary" onclick="window.location.href='dashboard.html'">
+                <span class="btn-icon">📊</span>
+                Dashboard
+            </button>
+            <button class="btn btn-primary" onclick="window.location.href='import.html'">
+                <span class="btn-icon">📤</span>
+                Import ข้อมูล
+            </button>
+            <button class="btn btn-primary" onclick="showManualInput()">
+                <span class="btn-icon">⌨️</span>
+                กรอก S/N ด้วยมือ
+            </button>
+            <button class="btn btn-primary" onclick="showScanner()">
+                <span class="btn-icon">📷</span>
+                ใช้กล้องสแกน
+            </button>
+            <button class="btn btn-sync" id="syncNowBtn" onclick="syncNow()" style="display: none;">
+                <span class="btn-icon">🔄</span>
+                Sync ทันที
+            </button>
+            <button class="btn btn-secondary" onclick="refreshReport()">
+                <span class="btn-icon">🔄</span>
+                รีเฟรชข้อมูล
+            </button>
+            <button class="btn btn-warning" onclick="resetCount()">
+                <span class="btn-icon">⚠️</span>
+                รีเซ็ตการนับ
+            </button>
+            <button class="btn btn-success" onclick="exportCountRecords()">
+                <span class="btn-icon">📤</span>
+                Export
+            </button>
+        </div>
+
+        <!-- Manual Input Section -->
+        <div id="manualInput" class="card" style="display: none;">
+            <div class="card-header">
+                <h3>📝 กรอกข้อมูลด้วยมือ</h3>
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <label for="serialNumber">หมายเลข S/N (Serial Number)</label>
+                    <input type="text" id="serialNumber" placeholder="กรอก S/N ที่นี่" oninput="checkAndSave()"
+                        autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <label for="productName">ชื่อสินค้า</label>
+                    <input type="text" id="productName" maxlength="100" disabled>
+                </div>
+                <div class="input-group">
+                    <label for="employeeId">รหัสพนักงาน</label>
+                    <input type="text" id="employeeId" readonly>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scanner Section -->
+        <div id="scannerSection" class="card" style="display: none;">
+            <div class="card-header">
+                <h3>📷 สแกนบาร์โค้ด</h3>
+            </div>
+            <div class="card-body">
+                <div id="reader"></div>
+                <div id="scannerResult"></div>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div id="message" class="message success"></div>
+        <div id="error" class="message error"></div>
+        <div id="popup" class="popup"></div>
+
+        <!-- Count History -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📋 ประวัติการนับ</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-container" id="historyTableContainer">
+                    <table id="historyTable">
+                        <thead>
+                            <tr>
+                                <th>หมายเลข S/N</th>
+                                <th>ชื่อสินค้า</th>
+                                <th>วันที่/เวลา</th>
+                                <th>รหัสพนักงาน</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Uncounted Items -->
+        <div class="card">
+            <div class="card-header">
+                <h3>⏱️ สินค้าที่ยังไม่ได้นับ</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-container" id="uncountedTableContainer">
+                    <table id="uncountedTable">
+                        <thead>
+                            <tr>
+                                <th>หมายเลข S/N</th>
+                                <th>ชื่อสินค้า</th>
+                                <th>จำนวนทั้งหมด</th>
+                            </tr>
+                        </thead>
+                        <tbody id="uncountedBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Stock Counting System | Made with ❤️</p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>กำลังโหลด...</p>
+    </div>
+
+    <!-- PWA Install Prompt -->
+    <div id="installPrompt" class="install-prompt" style="display: none;">
+        <div class="install-content">
+            <span class="install-icon">📱</span>
+            <div class="install-text">
+                <strong>ติดตั้ง App</strong>
+                <p>ติดตั้งเป็น App เพื่อใช้งานง่ายขึ้น</p>
+            </div>
+            <button class="btn btn-primary btn-small" id="installButton">ติดตั้ง</button>
+            <button class="btn btn-secondary btn-small" id="dismissInstall">ไว้ทีหลัง</button>
+        </div>
+    </div>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✓ Service Worker registered:', registration.scope);
+
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New version available
+                                    if (confirm('มีเวอร์ชันใหม่! รีโหลดหน้าเพื่ออัพเดทไหม?')) {
+                                        newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('✗ Service Worker registration failed:', error);
+                    });
+            });
+
+            // Listen for controller change
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                console.log('Service Worker updated, reloading...');
+                window.location.reload();
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA install prompt available');
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Show install prompt after 10 seconds
+            setTimeout(() => {
+                const installPrompt = document.getElementById('installPrompt');
+                if (installPrompt && !localStorage.getItem('pwaInstallDismissed')) {
+                    installPrompt.style.display = 'block';
+                    installPrompt.classList.add('show');
+                }
+            }, 10000);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const installButton = document.getElementById('installButton');
+            const dismissButton = document.getElementById('dismissInstall');
+
+            if (installButton) {
+                installButton.addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const { outcome } = await deferredPrompt.userChoice;
+                        console.log(`User response: ${outcome}`);
+                        deferredPrompt = null;
+                        document.getElementById('installPrompt').style.display = 'none';
+                    }
+                });
+            }
+
+            if (dismissButton) {
+                dismissButton.addEventListener('click', () => {
+                    document.getElementById('installPrompt').style.display = 'none';
+                    localStorage.setItem('pwaInstallDismissed', 'true');
+                });
+            }
+        });
+
+        // Detect if app is installed
+        window.addEventListener('appinstalled', () => {
+            console.log('✓ PWA installed successfully!');
+            document.getElementById('installPrompt').style.display = 'none';
+            localStorage.setItem('pwaInstalled', 'true');
+        });
+
+        // Check if running as PWA
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            console.log('✓ Running as PWA');
+            document.body.classList.add('pwa-mode');
+        }
+    </script>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- App Script -->
+    <script type="module" src="app-supabase.js"></script>
+</body>
+
+</html>

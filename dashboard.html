@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Stock Counting System</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Manager Dashboard - Real-time Stock Counting Analytics">
+    <meta name="theme-color" content="#667eea">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <!-- Background Gradient -->
+    <div class="bg-gradient"></div>
+
+    <!-- Main Container -->
+    <div class="container dashboard-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1 class="title">
+                    <span class="icon">📊</span>
+                    Manager Dashboard
+                </h1>
+                <p class="subtitle">Real-time Stock Counting Analytics</p>
+                <div class="header-actions">
+                    <a href="index.html" class="back-link">← กลับหน้านับสต็อก</a>
+                    <a href="import.html" class="back-link">📤 Import ข้อมูล</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Real-time Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card-large primary">
+                <div class="stat-icon-large">✅</div>
+                <div class="stat-content-large">
+                    <div class="stat-label-large">สแกนแล้ว</div>
+                    <div class="stat-value-large" id="totalScanned">0</div>
+                    <div class="stat-change" id="scannedChange">+0 วันนี้</div>
+                </div>
+            </div>
+
+            <div class="stat-card-large warning">
+                <div class="stat-icon-large">⏳</div>
+                <div class="stat-content-large">
+                    <div class="stat-label-large">คงเหลือ</div>
+                    <div class="stat-value-large" id="totalRemaining">0</div>
+                    <div class="stat-change" id="remainingPercent">0%</div>
+                </div>
+            </div>
+
+            <div class="stat-card-large success">
+                <div class="stat-icon-large">📦</div>
+                <div class="stat-content-large">
+                    <div class="stat-label-large">Stock ทั้งหมด</div>
+                    <div class="stat-value-large" id="totalStock">0</div>
+                    <div class="stat-change">รายการ</div>
+                </div>
+            </div>
+
+            <div class="stat-card-large info">
+                <div class="stat-icon-large">👥</div>
+                <div class="stat-content-large">
+                    <div class="stat-label-large">พนักงาน</div>
+                    <div class="stat-value-large" id="totalEmployees">0</div>
+                    <div class="stat-change">คนที่ทำงาน</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📈 ความคืบหน้าโดยรวม</h3>
+            </div>
+            <div class="card-body">
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span class="progress-label">ความคืบหน้า</span>
+                        <span class="progress-percentage" id="progressPercentage">0%</span>
+                    </div>
+                    <div class="progress-bar-large">
+                        <div class="progress-fill-large" id="progressFill"></div>
+                    </div>
+                    <div class="progress-details">
+                        <span id="progressText">0 / 0 รายการ</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="charts-row">
+            <!-- Progress Chart -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>📊 กราฟความคืบหน้า</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Employee Performance -->
+            <div class="card chart-card">
+                <div class="card-header">
+                    <h3>👥 ประสิทธิภาพพนักงาน</h3>
+                </div>
+                <div class="card-body">
+                    <canvas id="employeeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Feed & Top Performers -->
+        <div class="dashboard-grid">
+            <!-- Live Activity Feed -->
+            <div class="card activity-card">
+                <div class="card-header">
+                    <h3>🔴 กิจกรรมล่าสุด (Real-time)</h3>
+                    <span class="live-indicator">● LIVE</span>
+                </div>
+                <div class="card-body">
+                    <div class="activity-feed" id="activityFeed">
+                        <div class="activity-item placeholder">
+                            <div class="activity-icon">⏳</div>
+                            <div class="activity-content">
+                                <p class="activity-text">รอข้อมูล...</p>
+                                <span class="activity-time">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Performers -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🏆 Top Performers</h3>
+                </div>
+                <div class="card-body">
+                    <div class="leaderboard" id="leaderboard">
+                        <div class="leaderboard-item placeholder">
+                            <div class="rank">-</div>
+                            <div class="employee-info">
+                                <span class="employee-name">รอข้อมูล...</span>
+                            </div>
+                            <div class="employee-count">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Scans Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📋 การสแกนล่าสุด (50 รายการ)</h3>
+                <button class="btn btn-primary btn-small" onclick="exportReport()">
+                    📥 Export รายงาน
+                </button>
+            </div>
+            <div class="card-body">
+                <div class="table-container" style="max-height: 400px;">
+                    <table id="recentScansTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>S/N</th>
+                                <th>สินค้า</th>
+                                <th>พนักงาน</th>
+                                <th>เวลา</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentScansBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem;">
+                                    รอข้อมูล...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Stock Counting System | Manager Dashboard</p>
+            <p style="font-size: 0.875rem; color: var(--text-muted);">
+                อัพเดทอัตโนมัติแบบ Real-time 🔄
+            </p>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>กำลังโหลด...</p>
+    </div>
+
+    <!-- Dashboard Script -->
+    <script type="module" src="dashboard-supabase.js"></script>
+</body>
+
+</html>

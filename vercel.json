@@ -1,0 +1,17 @@
+{
+    "rewrites": [
+        {
+            "source": "/dashboard",
+            "destination": "/dashboard.html"
+        },
+        {
+            "source": "/import",
+            "destination": "/import.html"
+        },
+        {
+            "source": "/",
+            "destination": "/index.html"
+        }
+    ],
+    "cleanUrls": true
+}

@@ -1,0 +1,53 @@
+{
+    "firestore": {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
+    },
+    "hosting": {
+        "public": ".",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**",
+            "**/*.md",
+            "BACKEND_UPDATE.md",
+            "PWA_GUIDE.md",
+            "README.md",
+            "FIREBASE_SETUP.md",
+            "FIREBASE_QUICKSTART.md",
+            "PHASE1_COMPLETE.md",
+            "PHASE2_COMPLETE.md",
+            "PHASE3_COMPLETE.md",
+            "USER_MANUAL.md",
+            "FINAL_SUMMARY.md",
+            "สรุปการปรับปรุง.md",
+            "app.js"
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ],
+        "headers": [
+            {
+                "source": "**/*.@(jpg|jpeg|gif|png|webp)",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "max-age=7200"
+                    }
+                ]
+            },
+            {
+                "source": "**/*.@(js|css)",
+                "headers": [
+                    {
+                        "key": "Cache-Control",
+                        "value": "no-cache"
+                    }
+                ]
+            }
+        ]
+    }
+}
