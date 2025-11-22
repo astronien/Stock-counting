@@ -1,5 +1,5 @@
 // Service Worker for Stock Counting PWA
-const CACHE_NAME = 'stock-counting-v4'; // bump version to force update
+const CACHE_NAME = 'stock-counting-v5'; // bump version to force update
 const DYNAMIC_CACHE = 'stock-counting-dynamic-v1';
 
 // Assets to cache immediately
