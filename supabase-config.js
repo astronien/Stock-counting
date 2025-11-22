@@ -12,7 +12,14 @@ export function getSupabase() {
         console.error('Supabase SDK not loaded!');
         return null;
     }
-    return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    console.log('Initializing Supabase with URL:', SUPABASE_URL);
+    // Check for empty or invalid URL
+    if (!SUPABASE_URL || !SUPABASE_URL.startsWith('http')) {
+        console.error('Invalid Supabase URL:', SUPABASE_URL);
+        alert('Supabase URL ไม่ถูกต้อง กรุณาตรวจสอบ supabase-config.js');
+        return null;
+    }
+    return window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 }
 
 export const COLLECTIONS = {
