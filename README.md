@@ -4,7 +4,7 @@ A modern, beautiful web application for inventory stock counting with barcode sc
 
 ## ✨ Features
 
-- 📷 **Barcode Scanner** - Camera-based scanning for Code 128 and Code 39 barcodes
+- 📷 **Barcode Scanner** - Camera-based scanning for 12+ barcode formats (Code 128/39, EAN-13/8, UPC-A/E, QR Code, Data Matrix, and more)
 - ⌨️ **Manual Entry** - Manual serial number input option
 - 📊 **Real-time Dashboard** - Live count summary of scanned vs remaining items
 - 📋 **Count History** - Complete history of all counted items with timestamps
@@ -124,7 +124,7 @@ stock/
 - Check browser console for errors
 
 **Scan not registering:**
-- Ensure barcode is Code 128 or Code 39 format
+- Supported formats: Code 128/39, EAN-13/8, UPC-A/E, ITF, CODABAR, QR Code, Data Matrix, PDF-417, AZTEC
 - Hold camera steady and ensure good lighting
 - Try manual entry if scanning fails
 

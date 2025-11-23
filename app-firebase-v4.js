@@ -271,10 +271,29 @@ function onScanSuccess(decodedText, decodedResult) {
         pauseScanner();
     }
 
-    // Validate format
+    // Validate format - รองรับรูปแบบที่ใช้กับสินค้า electronic และ gadget
     const format = decodedResult.result.format.formatName;
-    if (format !== "CODE_128" && format !== "CODE_39") {
-        showScannerResult("FAIL", `ไม่ใช่บาร์โค้ด Code 128 หรือ Code 39!`, false);
+    const supportedFormats = [
+        // 1D Barcodes
+        "CODE_128",      // Serial numbers, internal tracking
+        "CODE_39",       // Industrial applications
+        "EAN_13",        // European Article Number (ใช้บ่อยมาก)
+        "EAN_8",         // EAN แบบสั้น
+        "UPC_A",         // Universal Product Code (ใช้บ่อยมาก)
+        "UPC_E",         // UPC แบบสั้น
+        "ITF",           // Interleaved 2 of 5 (กล่องหีบห่อ)
+        "CODABAR",       // บางประเภทสินค้า
+        // 2D Barcodes
+        "QR_CODE",       // QR Code (ใช้บ่อยมากในปัจจุบัน)
+        "DATA_MATRIX",   // ชิ้นส่วนอิเล็กทรอนิกส์ขนาดเล็ก
+        "PDF_417",       // 2D barcode ความจุสูง
+        "AZTEC"          // Compact 2D barcode
+    ];
+
+    console.log('Scanned barcode format:', format);
+
+    if (!supportedFormats.includes(format)) {
+        showScannerResult("FAIL", `รูปแบบบาร์โค้ดไม่รองรับ: ${format}`, false);
         resumeScannerDelayed();
         return;
     }
