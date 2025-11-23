@@ -1,5 +1,5 @@
 // Service Worker for Stock Counting PWA
-const CACHE_NAME = 'stock-counting-v6'; // bumped version to force update for Supabase fix
+const CACHE_NAME = 'stock-counting-v7'; // bumped version for barcode format update
 const DYNAMIC_CACHE = 'stock-counting-dynamic-v1';
 
 // Assets to cache immediately
@@ -8,6 +8,10 @@ const STATIC_ASSETS = [
     '/index.html',
     '/styles.css',
     '/app.js',
+    '/app-supabase.js',
+    '/app-firebase-v4.js',
+    '/supabase-config.js',
+    '/firebase-config-v4.js',
     '/manifest.json',
     'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
     'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap'
