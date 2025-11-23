@@ -61,7 +61,7 @@
 | `serialNumber` | TEXT | S/N ที่นับ |
 | `productName` | TEXT | ชื่อสินค้า |
 | `employeeId` | TEXT | รหัสพนักงาน |
-| `countedAt` | TIMESTAMP | วันที่/เวลาที่นับ |
+| `timestamp` | TIMESTAMP | วันที่/เวลาที่นับ |
 | `createdAt` | TIMESTAMP | วันที่สร้างรายการ |
 
 ---

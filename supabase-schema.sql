@@ -24,13 +24,13 @@ CREATE TABLE IF NOT EXISTS public.count_records (
     "serialNumber" TEXT NOT NULL,
     "productName" TEXT,
     "employeeId" TEXT,
-    "countedAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    "timestamp" TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Indexes for faster queries
 CREATE INDEX IF NOT EXISTS idx_count_records_serial ON public.count_records ("serialNumber");
-CREATE INDEX IF NOT EXISTS idx_count_records_counted ON public.count_records ("countedAt" DESC);
+CREATE INDEX IF NOT EXISTS idx_count_records_timestamp ON public.count_records ("timestamp" DESC);
 CREATE INDEX IF NOT EXISTS idx_count_records_employee ON public.count_records ("employeeId");
 
 -- ====================================
