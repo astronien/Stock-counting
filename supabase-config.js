@@ -8,18 +8,24 @@ export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 export function getSupabase() {
-    if (!window.supabase) {
-        console.error('Supabase SDK not loaded!');
+    // The CDN version exposes createClient directly on window.supabase
+    const { createClient } = window.supabase || {};
+
+    if (!createClient) {
+        console.error('Supabase SDK not loaded! Make sure the CDN script is loaded.');
         return null;
     }
+
     console.log('Initializing Supabase with URL:', SUPABASE_URL);
+
     // Check for empty or invalid URL
     if (!SUPABASE_URL || !SUPABASE_URL.startsWith('http')) {
         console.error('Invalid Supabase URL:', SUPABASE_URL);
         alert('Supabase URL ไม่ถูกต้อง กรุณาตรวจสอบ supabase-config.js');
         return null;
     }
-    return window.supabase.createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
+
+    return createClient(SUPABASE_URL.trim(), SUPABASE_ANON_KEY.trim());
 }
 
 export const COLLECTIONS = {
