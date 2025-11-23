@@ -310,11 +310,12 @@ function onScanSuccess(decodedText, decodedResult) {
     }
 
     // Success - Save
-    showScannerResult("PASS", `S/N: ${decodedText} | ${productName}`, true);
-    showPopup(`สแกนสำเร็จ: ${decodedText} (${format})`);
-    saveCount(decodedText, productName);
+    // showScannerResult("PASS", `S/N: ${decodedText} | ${productName}`, true); <-- Moved to saveCount
+    // showPopup(`สแกนสำเร็จ: ${decodedText} (${format})`); <-- Moved to saveCount
+    saveCount(decodedText, productName, format); // Pass format to saveCount
 
     // Resume scanner after delay
+    resumeScannerDelayed();
     resumeScannerDelayed();
 }
 
@@ -379,7 +380,7 @@ function getProductName(code) {
 }
 
 // ========== Save to Supabase ==========
-async function saveCount(serialNumber, productName) {
+async function saveCount(serialNumber, productName, format = 'UNKNOWN') {
     await checkEmployeeId();
 
     if (!lastEmployeeId) {
@@ -397,6 +398,10 @@ async function saveCount(serialNumber, productName) {
     // Add to pending queue (for offline support)
     pendingQueue.push(record);
     savePendingQueue();
+
+    // Show success feedback HERE (after successfully adding to queue)
+    showScannerResult("PASS", `S/N: ${serialNumber} | ${productName}`, true);
+    showPopup(`สแกนสำเร็จ: ${serialNumber} (${format})`);
 
     // Try to save to Supabase
     await syncPendingQueue();
@@ -427,6 +432,9 @@ async function syncPendingQueue() {
         console.log('✓ Synced', pendingQueue.length, 'items to Supabase');
         pendingQueue = [];
         savePendingQueue();
+
+        // Update UI immediately (don't wait for Realtime)
+        await loadCountHistory();
 
         showMessage('✓ บันทึกสำเร็จ');
     } catch (error) {
@@ -548,9 +556,14 @@ export async function resetCount() {
 
         pendingQueue = [];
         savePendingQueue();
+
+        // Update UI immediately
         countHistory = [];
         updateHistoryTable();
         updateCounts();
+
+        // Also reload from server to be sure
+        await loadCountHistory();
 
         showMessage('รีเซ็ตการนับสำเร็จ! ✓');
     } catch (error) {

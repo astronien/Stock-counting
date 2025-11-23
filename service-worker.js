@@ -1,5 +1,5 @@
 // Service Worker for Stock Counting PWA
-const CACHE_NAME = 'stock-counting-v7'; // bumped version for barcode format update
+const CACHE_NAME = 'stock-counting-v8'; // bumped version for UI update fix
 const DYNAMIC_CACHE = 'stock-counting-dynamic-v1';
 
 // Assets to cache immediately
