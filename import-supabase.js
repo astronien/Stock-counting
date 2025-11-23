@@ -233,7 +233,7 @@ window.importData = async function () {
         document.getElementById('progressSection').style.display = 'block';
 
         // Prepare data for bulk insert
-        const records = parsedData
+        const allRecords = parsedData
             .map(row => {
                 const serialNumber = (row[snIndex] || '').toString().trim();
                 const productName = (row[nameIndex] || '').toString().trim();
@@ -247,6 +247,20 @@ window.importData = async function () {
                 return null;
             })
             .filter(item => item !== null);
+
+        // Deduplicate by serialNumber - keep the last occurrence
+        // This prevents the "ON CONFLICT DO UPDATE command cannot affect row a second time" error
+        const recordsMap = new Map();
+        allRecords.forEach(record => {
+            recordsMap.set(record.serialNumber, record);
+        });
+        const records = Array.from(recordsMap.values());
+
+        // Show deduplication info if duplicates were found
+        const duplicateCount = allRecords.length - records.length;
+        if (duplicateCount > 0) {
+            showMessage(`⚠️ พบ S/N ซ้ำ ${duplicateCount} รายการ (จะใช้ข้อมูลล่าสุด)`);
+        }
 
         // Supabase can handle larger batches than Firestore
         // But let's stick to 1000 to be safe and show progress
